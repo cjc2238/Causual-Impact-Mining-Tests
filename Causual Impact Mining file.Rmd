@@ -3,14 +3,31 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+# Load Packages
 ```{r}
-install.packages("devtools")
+install.packages("devtools")*
 library(devtools)
-devtools::install_github("google/CausalImpact")
+install.packages("bsts")
+install.packages("xts")
+library("bsts")
+library("xts")
+install.packages("DBI")
+library("DBI")
+install.packages("Rcpp")
+library("Rcpp")
+install.packages("magrittr")
+library("magrittr")
+install.packages("tibble")
+library("tibble")
+install.packages("gtable")
+library("gtable")
+install.packages("scales")
+library("scales")
+devtools::install_github("google/CausalImpact", force = TRUE)
 library(CausalImpact)
 ```
 
-Create an example data set
+# Create an example data set
 
 ```{r}
 set.seed(1)
@@ -31,6 +48,84 @@ head(data)
 Visualize the generated data
 
 ```{r}
+matplot(data, type = "l")
+```
+# run an analysis 
 
+To estimate a causal effect, we begin by specifying which period in the data should be used for training the model (pre-intervention period) and which period for computing a counterfactual prediction (post-intervention period).
+
+```{r}
+pre.period <- c(1, 70)
+post.period <- c(71, 100)
+```
+
+This says that time points 1 … 70 will be used for training, and time points 71 … 100 will be used for computing predictions.
+
+To perform inference, we run the analysis using:
+
+```{r}
+impact <- CausalImpact(data, pre.period, post.period)
+```
+
+This instructs the package to assemble a structural time-series model, perform posterior inference, and compute estimates of the causal effect. The return value is a CausalImpact object.
+
+# Plot the results
+
+```{r}
+plot(impact)
+```
+
+
+
+By default, the plot contains three panels. The first panel shows the data and a counterfactual prediction for the post-treatment period. The second panel shows the difference between observed data and counterfactual predictions. This is the pointwise causal effect, as estimated by the model. The third panel adds up the pointwise contributions from the second panel, resulting in a plot of the cumulative effect of the intervention.
+
+Remember, once again, that all of the above inferences depend critically on the assumption that the covariates were not themselves affected by the intervention. The model also assumes that the relationship between covariates and treated time series, as established during the pre-period, remains stable throughout the post-period.
+
+
+# Working with dates and times
+
+```{r}
+time.points <- seq.Date(as.Date("2014-01-01"), by = 1, length.out = 100)
+data <- zoo(cbind(y, x1), time.points)
+head(data)
+```
+
+We can now specify the pre-period and the post-period in terms of time points rather than indices:
+
+```{r}
+pre.period <- as.Date(c("2014-01-01", "2014-03-11"))
+post.period <- as.Date(c("2014-03-12", "2014-04-10"))
+```
+
+As a result, the x-axis of the plot shows time points instead of indices:
+
+```{r}
+impact <- CausalImpact(data, pre.period, post.period)
+plot(impact)
+```
+
+
+# Print summary
+
+To obtain a numerical summary of the analysis, we use:
+
+```{r}
+summary(impact)
+```
+
+The Average column talks about the average (across time) during the post-intervention period (in the example: time points 71 through 100). The Cumulative column sums up individual time points, which is a useful perspective if the response variable represents a flow quantity (such as queries, clicks, visits, installs, sales, or revenue) rather than a stock quantity (such as number of users or stock price).
+
+In the example, the estimated average causal effect of treatment was 11 (rounded to a whole number; for full precision see impact$summary). This is because we observed an average value of 99 but would have expected an average value of only 89. The 95% posterior interval of the average effect is [9.8, 11]. Since this excludes 0, we (correctly) conclude that the intervention had a causal effect on the response variable. Since we generated the data ourselves, we know that we injected a true effect of 10, and so the model accurately recovered ground truth. One reason for this is that we ensured, by design, that the covariate x1 was not itself affected by the intervention. In practice, we must always reason whether this assumption is justified.
+
+For additional guidance about the correct interpretation of the summary table, the package provides a verbal interpretation, which we can print using:
+
+```{r}
+summary(impact, "report")
+```
+
+The individual numbers in the table, at full precision, can be accessed using:
+
+```{r}
+impact$summary
 ```
 

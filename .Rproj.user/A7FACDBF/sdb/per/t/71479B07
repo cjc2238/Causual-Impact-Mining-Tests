@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"R Notebook\"\noutput: html_notebook\n---\n\n```{r}\ninstall.packages(\"devtools\")\nlibrary(devtools)\ndevtools::install_github(\"google/CausalImpact\")\nlibrary(CausalImpact)\n```\n\nCreate an example data set\n\n```{r}\nset.seed(1)\nx1 <- 100 + arima.sim(model = list(ar = 0.999), n = 100)\ny <- 1.2 * x1 + rnorm(100)\ny[71:100] <- y[71:100] + 10\ndata <- cbind(y, x1)\n```\n\n```{r}\ndim(data)\n```\n\n```{r}\nhead(data)\n```\n\nVisualize the generated data\n\n```{r}\n\n```\n\n",
+    "created" : 1491421089477.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2726945195",
+    "id" : "71479B07",
+    "lastKnownWriteTime" : 1491421465,
+    "last_content_update" : 1491421465288,
+    "path" : "D:/Documents 2/R/Causual Impact Mining/Causual Impact Mining file.Rmd",
+    "project_path" : "Causual Impact Mining file.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

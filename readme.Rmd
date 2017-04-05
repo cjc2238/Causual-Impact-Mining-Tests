@@ -6,24 +6,6 @@ output: pdf_document
 
 # Load Packages
 ```{r}
-install.packages("devtools")*
-library(devtools)
-install.packages("bsts")
-install.packages("xts")
-library("bsts")
-library("xts")
-install.packages("DBI")
-library("DBI")
-install.packages("Rcpp")
-library("Rcpp")
-install.packages("magrittr")
-library("magrittr")
-install.packages("tibble")
-library("tibble")
-install.packages("gtable")
-library("gtable")
-install.packages("scales")
-library("scales")
 devtools::install_github("google/CausalImpact", force = TRUE)
 library(CausalImpact)
 ```
